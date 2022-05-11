@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"link.alpinia.SlashComLib","l":"CommandClass"},{"p":"link.alpinia.SlashComLib","l":"CommandInfo"},{"p":"link.alpinia.SlashComLib","l":"CommandRegistrar"},{"p":"link.alpinia.SlashComLib","l":"CommandType"}];updateSearchResults();

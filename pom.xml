@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>link.alpinia</groupId>
+    <artifactId>SlashComLib</artifactId>
+    <version>1.0-RELEASE</version>
+    <developers>
+        <developer>
+            <email>admin@alpinia.link</email>
+            <name>Laika Schultz</name>
+            <url>https://alpinia.link</url>
+            <organizationUrl>https://initiate.space</organizationUrl>
+            <timezone>Pacific Standard Time</timezone>
+        </developer>
+    </developers>
+    <description>
+        This is a helpful library for the implementation of Slash Commands with JDA.
+        It contains framework for the following
+         - Quick Command Class Loading
+         - Abstract Command Class easily repeatable
+         - Slash Command Info development in an easy way
+         - All easily implementable into a Discord Bot
+    </description>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>5.0.0-alpha.9</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
+        </dependency>
+    </dependencies>
+</project>
