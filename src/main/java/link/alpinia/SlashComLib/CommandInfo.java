@@ -1,6 +1,7 @@
 package link.alpinia.SlashComLib;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.HashMap;
 
@@ -12,9 +13,7 @@ public class CommandInfo {
     private String name;
     private String description;
     private CommandType type;
-    private HashMap<String, OptionType> options;
-    private HashMap<String, String> optionDescriptions;
-    private HashMap<String, Boolean> optionRequirements;
+    private HashMap<String, OptionData> options;
     private HashMap<String, CommandInfo> subCommands;
 
     /**
@@ -28,8 +27,6 @@ public class CommandInfo {
         this.description = description;
         this.type = type;
         this.options = new HashMap<>();
-        this.optionDescriptions = new HashMap<>();
-        this.optionRequirements = new HashMap<>();
         this.subCommands = new HashMap<>();
     }
 
@@ -51,16 +48,8 @@ public class CommandInfo {
         return name;
     }
 
-    public HashMap<String, OptionType> getOptions() {
+    public HashMap<String, OptionData> getOptions() {
         return options;
-    }
-
-    public HashMap<String, Boolean> getOptionRequirements() {
-        return optionRequirements;
-    }
-
-    public HashMap<String, String> getOptionDescriptions() {
-        return optionDescriptions;
     }
 
     public HashMap<String, CommandInfo> getSubCommands() { return subCommands; }
@@ -77,9 +66,13 @@ public class CommandInfo {
             System.out.println("[SlashComLib] Malformed Command! Contains subcommands when trying to implement options. " +
                     "Discord will reject this command if upserted!");
         }
-        options.put(name, type);
-        optionDescriptions.put(name, description);
-        optionRequirements.put(name, required);
+        OptionData od = new OptionData(type, name, description);
+        od.setRequired(required);
+        options.put(name, od);
+    }
+
+    public void addOption(OptionData data) {
+        options.put(data.getName(), data);
     }
 
     /**

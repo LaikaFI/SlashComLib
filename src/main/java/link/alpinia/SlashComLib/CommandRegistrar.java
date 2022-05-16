@@ -3,6 +3,8 @@ package link.alpinia.SlashComLib;
 import com.google.common.reflect.ClassPath;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 
@@ -107,7 +109,7 @@ public class CommandRegistrar {
                     CommandInfo si = ci.getSubCommands().get(name);
                     SubcommandData sd = new SubcommandData(si.getName(), si.getDescription());
                     for (String option : si.getOptions().keySet()) {
-                        sd.addOption(si.getOptions().get(option), option, si.getOptionDescriptions().get(option), si.getOptionRequirements().get(option));
+                        sd.addOptions(si.getOptions().get(option));
                     }
                     cca.addSubcommands(sd);
                 }
@@ -115,7 +117,7 @@ public class CommandRegistrar {
             if(ci.hasOptions()) {
                 for(String name : ci.getOptions().keySet()) {
                     //Any intelligent IDE will rage about the option not being used, it's added to the action then executed later, DO not edit this.
-                    cca.addOption(ci.getOptions().get(name), name, ci.getOptionDescriptions().get(name), ci.getOptionRequirements().get(name));
+                    cca.addOptions(ci.getOptions().get(name));
                 }
             }
             System.out.println("[SlashComLib] Finished preparing GlobalCommand " + cca.getName());
@@ -145,7 +147,7 @@ public class CommandRegistrar {
                         CommandInfo si = ci.getSubCommands().get(name);
                         SubcommandData sd = new SubcommandData(si.getName(), si.getDescription());
                         for (String option : si.getOptions().keySet()) {
-                            sd.addOption(si.getOptions().get(option), option, si.getOptionDescriptions().get(option), si.getOptionRequirements().get(option));
+                            sd.addOptions(si.getOptions().get(option));
                         }
                         cca.addSubcommands(sd);
                     }
@@ -153,7 +155,7 @@ public class CommandRegistrar {
                 if(ci.hasOptions()) {
                     for(String name : ci.getOptions().keySet()) {
                         //Any intelligent IDE will rage about the option not being used, it's added to the action then executed later, DO not edit this.
-                        cca.addOption(ci.getOptions().get(name), name, ci.getOptionDescriptions().get(name), ci.getOptionRequirements().get(name));
+                        cca.addOptions(ci.getOptions().get(name));
                     }
                 }
                 //Push w/ modifications.
