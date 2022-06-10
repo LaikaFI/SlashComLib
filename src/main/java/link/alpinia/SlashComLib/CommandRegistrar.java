@@ -3,8 +3,6 @@ package link.alpinia.SlashComLib;
 import com.google.common.reflect.ClassPath;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 
@@ -102,30 +100,36 @@ public class CommandRegistrar {
      * @param commandClass - the command to be registered.
      */
     public void registerGlobalCommands(JDA jda, CommandClass commandClass) {
-        for(var ci : commandClass.getSlashCommandInfo()) {
-            CommandCreateAction cca = jda.upsertCommand(ci.getName(), ci.getDescription());
-            if(ci.hasSubCommands()) {
-                for (String name : ci.getSubCommands().keySet()) {
-                    CommandInfo si = ci.getSubCommands().get(name);
-                    SubcommandData sd = new SubcommandData(si.getName(), si.getDescription());
-                    for (String option : si.getOptions().keySet()) {
-                        sd.addOptions(si.getOptions().get(option));
+        for(var ci : commandClass.getCommandInfo()) {
+            if(ci instanceof SlashCommandInfo) {
+                var sci = (SlashCommandInfo) ci;
+                CommandCreateAction cca = jda.upsertCommand(sci.getName(), sci.getDescription());
+                if (sci.hasSubCommands()) {
+                    for (String name : sci.getSubCommands().keySet()) {
+                        SlashCommandInfo si = sci.getSubCommands().get(name);
+                        SubcommandData sd = new SubcommandData(si.getName(), si.getDescription());
+                        for (String option : si.getOptions().keySet()) {
+                            sd.addOptions(si.getOptions().get(option));
+                        }
+                        cca.addSubcommands(sd);
                     }
-                    cca.addSubcommands(sd);
+                }
+                if (sci.hasOptions()) {
+                    for (String name : sci.getOptions().keySet()) {
+                        //Any intelligent IDE will rage about the option not being used, it's added to the action then executed later, DO not edit this.
+                        cca.addOptions(sci.getOptions().get(name));
+                    }
+                }
+                System.out.println("[SlashComLib] Finished preparing GlobalCommand " + cca.getName());
+                try {
+                    cca.queue();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.out.println("[SlashComLib] Failed to register global command.");
                 }
             }
-            if(ci.hasOptions()) {
-                for(String name : ci.getOptions().keySet()) {
-                    //Any intelligent IDE will rage about the option not being used, it's added to the action then executed later, DO not edit this.
-                    cca.addOptions(ci.getOptions().get(name));
-                }
-            }
-            System.out.println("[SlashComLib] Finished preparing GlobalCommand " + cca.getName());
-            try {
-                cca.queue();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.out.println("[SlashComLib] Failed to register global command.");
+            if(ci instanceof ContextCommandInfo) {
+                jda.upsertCommand(((ContextCommandInfo) ci).build()).queue();
             }
         }
     }
@@ -137,38 +141,47 @@ public class CommandRegistrar {
      */
     public void registerForGuild(Guild guild, List<CommandClass> activeCommands) {
         System.out.println("[SlashComLib] Registering commands for Guild[" + guild.getId() + "]");
-        int i = 0;
-        for(CommandClass cmd : activeCommands) {
-            for(CommandInfo ci : cmd.getSlashCommandInfo()) {
-                CommandCreateAction cca = guild.upsertCommand(ci.getName(), ci.getDescription());
-                i++;
-                if(ci.hasSubCommands()) {
-                    for (String name : ci.getSubCommands().keySet()) {
-                        CommandInfo si = ci.getSubCommands().get(name);
-                        SubcommandData sd = new SubcommandData(si.getName(), si.getDescription());
-                        for (String option : si.getOptions().keySet()) {
-                            sd.addOptions(si.getOptions().get(option));
+        int i = 0; //Slash Cmds
+        int c = 0; //Context Cmds
+        for (CommandClass cmd : activeCommands) {
+            for (CommandInfo ci : cmd.getCommandInfo()) {
+                if (ci instanceof SlashCommandInfo) {
+                    var sci = (SlashCommandInfo) ci;
+                    CommandCreateAction cca = guild.upsertCommand(sci.getName(), sci.getDescription());
+                    i++;
+                    if (sci.hasSubCommands()) {
+                        for (String name : sci.getSubCommands().keySet()) {
+                            SlashCommandInfo si = sci.getSubCommands().get(name);
+                            SubcommandData sd = new SubcommandData(si.getName(), si.getDescription());
+                            for (String option : si.getOptions().keySet()) {
+                                sd.addOptions(si.getOptions().get(option));
+                            }
+                            cca.addSubcommands(sd);
                         }
-                        cca.addSubcommands(sd);
+                    }
+                    if (sci.hasOptions()) {
+                        for (String name : sci.getOptions().keySet()) {
+                            //Any intelligent IDE will rage about the option not being used, it's added to the action then executed later, DO not edit this.
+                            cca.addOptions(sci.getOptions().get(name));
+                        }
+                    }
+                    //Push w/ modifications.
+                    //commented for spam sake info("Command: " + ci.getName() + " registration on " + guild.getId() + " completed.");
+                    try {
+                        cca.queue();
+                    } catch (Exception ex) {
+                        //Only time this *should* occur is in the event of a server not having the proper scope.
+                        System.out.println("[SlashComLib] Failed to queue command for RestAction, not printing stack to avoid console spam. (Improper Scope?)");
                     }
                 }
-                if(ci.hasOptions()) {
-                    for(String name : ci.getOptions().keySet()) {
-                        //Any intelligent IDE will rage about the option not being used, it's added to the action then executed later, DO not edit this.
-                        cca.addOptions(ci.getOptions().get(name));
-                    }
-                }
-                //Push w/ modifications.
-                //commented for spam sake info("Command: " + ci.getName() + " registration on " + guild.getId() + " completed.");
-                try {
-                    cca.queue();
-                } catch (Exception ex) {
-                    //Only time this *should* occur is in the event of a server not having the proper scope.
-                    System.out.println("[SlashComLib] Failed to queue command for RestAction, not printing stack to avoid console spam.");
+                if(ci instanceof ContextCommandInfo) {
+                    guild.upsertCommand(((ContextCommandInfo) ci).build()).queue();
+                    c++;
                 }
             }
+            System.out.println("[SlashComLib] Registered " + i + " slash commands. On Guild[" + guild.getId() + "]");
+            System.out.println("[SlashComLib] Registered " + c + " context commands. On Guild[" + guild.getId() + "]");
         }
-        System.out.println("[SlashComLib] Registered " + i + " commands. On Guild[" + guild.getId() + "]");
     }
  }
 
