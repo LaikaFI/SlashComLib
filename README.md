@@ -20,6 +20,6 @@ Javadocs are under the docs directory.
 <dependency>
  <groupId>com.github.LaikaFI</groupId>
  <artifactId>SlashComLib</artifactId>
- <version>v1.0.0</version>
+ <version>v1.2.0</version>
 </dependency>
 ```
