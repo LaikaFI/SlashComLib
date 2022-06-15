@@ -100,6 +100,7 @@ public class CommandRegistrar {
      * @param commandClass - the command to be registered.
      */
     public void registerGlobalCommands(JDA jda, CommandClass commandClass) {
+        if(commandClass.getCommandInfo().size() < 1 || commandClass.getCommandInfo() == null) { return; }
         for(var ci : commandClass.getCommandInfo()) {
             if(ci instanceof SlashCommandInfo) {
                 var sci = (SlashCommandInfo) ci;
@@ -144,6 +145,7 @@ public class CommandRegistrar {
         int i = 0; //Slash Cmds
         int c = 0; //Context Cmds
         for (CommandClass cmd : activeCommands) {
+            if(cmd.getCommandInfo().size() < 1 || cmd.getCommandInfo() == null) { continue; }
             for (CommandInfo ci : cmd.getCommandInfo()) {
                 if (ci instanceof SlashCommandInfo) {
                     var sci = (SlashCommandInfo) ci;
